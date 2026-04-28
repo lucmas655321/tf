@@ -174,6 +174,12 @@ This is a proof of concept — functional, tested, used daily on this codebase, 
 
 ---
 
+## Contributing
+
+This is a one-person side project. If you find it useful, any help is welcome — bug reports, ideas, benchmarks on your own codebase, or just a star. Open an issue or a PR.
+
+---
+
 ## License
 
 MIT
