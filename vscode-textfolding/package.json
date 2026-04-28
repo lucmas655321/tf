@@ -1,0 +1,59 @@
+{
+  "name": "vscode-textfolding",
+  "displayName": "TextFolding",
+  "description": "Smalltalk-style Miller columns navigation for structured text",
+  "version": "0.1.0",
+  "engines": { "vscode": "^1.85.0" },
+  "categories": ["Other"],
+  "activationEvents": ["onStartupFinished"],
+  "main": "./out/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "textfolding.open",
+        "title": "TextFolding: Open Miller View"
+      },
+      {
+        "command": "textfolding.openAndClose",
+        "title": "TextFolding: Open Miller View (Close Original)"
+      }
+    ],
+    "keybindings": [
+      {
+        "command": "textfolding.open",
+        "key": "ctrl+alt+m",
+        "mac": "cmd+alt+m"
+      },
+      {
+        "command": "textfolding.openAndClose",
+        "key": "ctrl+alt+shift+m",
+        "mac": "cmd+alt+shift+m"
+      }
+    ],
+    "configuration": {
+      "title": "TextFolding",
+      "properties": {
+        "textfolding.pythonPath": {
+          "type": "string",
+          "default": "python3",
+          "description": "Path to Python interpreter"
+        },
+        "textfolding.parserPath": {
+          "type": "string",
+          "default": "",
+          "description": "Path to parser3.py (empty = auto-detect from extension dir)"
+        }
+      }
+    }
+  },
+  "scripts": {
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "package": "npx vsce package"
+  },
+  "devDependencies": {
+    "@types/vscode": "^1.85.0",
+    "@types/node": "^20.0.0",
+    "typescript": "^5.3.0"
+  }
+}

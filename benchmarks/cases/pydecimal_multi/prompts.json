@@ -1,0 +1,92 @@
+[
+  {
+    "id": "p1_architecture",
+    "file": "pydecimal",
+    "prompt_a": "p1_a.md",
+    "prompt_tf": "p1_tf.md"
+  },
+  {
+    "id": "p2_behavior",
+    "file": "pydecimal",
+    "prompt_a": "p2_a.md",
+    "prompt_tf": "p2_tf.md"
+  },
+  {
+    "id": "p3_edit",
+    "file": "pydecimal",
+    "prompt_a": "p3_a.md",
+    "prompt_tf": "p3_tf.md"
+  },
+  {
+    "id": "p4_verify_edit",
+    "file": "pydecimal",
+    "prompt_a": "p4_a.md",
+    "prompt_tf": "p4_tf.md"
+  },
+  {
+    "id": "p5_new_feature",
+    "file": "pydecimal",
+    "prompt_a": "p5_a.md",
+    "prompt_tf": "p5_tf.md"
+  },
+  {
+    "id": "p6_consistency",
+    "file": "pydecimal",
+    "prompt_a": "p6_a.md",
+    "prompt_tf": "p6_tf.md"
+  },
+  {
+    "id": "p7_rounding",
+    "file": "pydecimal",
+    "prompt_a": "p7_a.md",
+    "prompt_tf": "p7_tf.md"
+  },
+  {
+    "id": "p8_signum",
+    "file": "pydecimal",
+    "prompt_a": "p8_a.md",
+    "prompt_tf": "p8_tf.md"
+  },
+  {
+    "id": "p9_review_signum",
+    "file": "pydecimal",
+    "prompt_a": "p9_a.md",
+    "prompt_tf": "p9_tf.md"
+  },
+  {
+    "id": "p10_context",
+    "file": "pydecimal",
+    "prompt_a": "p10_a.md",
+    "prompt_tf": "p10_tf.md"
+  },
+  {
+    "id": "p11_is_special",
+    "file": "pydecimal",
+    "prompt_a": "p11_a.md",
+    "prompt_tf": "p11_tf.md"
+  },
+  {
+    "id": "p12_eng_dict",
+    "file": "pydecimal",
+    "prompt_a": "p12_a.md",
+    "prompt_tf": "p12_tf.md"
+  },
+  {
+    "id": "p13_review_cluster",
+    "file": "pydecimal",
+    "prompt_a": "p13_a.md",
+    "prompt_tf": "p13_tf.md"
+  },
+  {
+    "id": "p14_thread_local",
+    "file": "pydecimal",
+    "prompt_a": "p14_a.md",
+    "prompt_tf": "p14_tf.md"
+  },
+  {
+    "id": "p15_clamp",
+    "file": "pydecimal",
+    "prompt_a": "p15_a.md",
+    "prompt_tf": "p15_tf.md"
+  }
+]

@@ -1,0 +1,9 @@
+__pycache__/
+*.pyc
+*.egg-info/
+build/
+dist/
+.tf/
+vscode-textfolding/node_modules/
+vscode-textfolding/out/
+sync_public.sh

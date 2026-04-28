@@ -1,0 +1,30 @@
+#[of]: root
+Riga fuori da tutto — livello root.
+#[of]: intro
+TextFolding struttura documenti in blocchi navigabili.
+Ogni blocco ha un path univoco e può contenere sotto-blocchi.
+#[cf]
+#[of]: sezione_a
+#[of]: sotto_a1
+Primo sotto-blocco di sezione_a.
+Contenuto riga 1.
+Contenuto riga 2.
+#[cf]
+#[of]: sotto_a2
+Secondo sotto-blocco di sezione_a.
+Una sola riga di testo.
+#[cf]
+#[cf]
+#[of]: sezione_b
+#[of]: sotto_b1
+Unico sotto-blocco di sezione_b.
+Tre righe.
+Fine.
+#[cf]
+#[of]: conclusione
+Fine del documento golden sample.
+Usato come riferimento per i test di idempotenza.
+#[cf]
+#[cf]
+Altra riga root fuori da blocchi.
+#[cf]

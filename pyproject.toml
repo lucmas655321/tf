@@ -1,0 +1,34 @@
+[build-system]
+requires = ["setuptools>=42"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "textfolding"
+version = "0.1.0"
+description = "Marker-based structural navigation for LLM agents — reduce token consumption via selective block reading"
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+authors = [
+    { name = "Luciano Masala" }
+]
+dependencies = [
+    "mcp>=1.0.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/lucmas655321/tf"
+
+[project.scripts]
+tf = "tf_backend:main"
+tf-mcp = "tf_mcp:main"
+tf-mcp-dev = "tf_mcp:main_dev"
+tf-ai = "tf_mcp:main_ai"
+
+[tool.setuptools]
+py-modules = ["tf_backend", "tf_mcp"]
+packages = ["tf_wiki"]
+
+[tool.setuptools.package-data]
+tf_wiki = ["*.md", "*.tf"]
+

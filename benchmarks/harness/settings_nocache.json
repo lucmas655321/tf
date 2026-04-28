@@ -1,0 +1,5 @@
+{
+  "env": {
+    "DISABLE_PROMPT_CACHING": "1"
+  }
+}
