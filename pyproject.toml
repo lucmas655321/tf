@@ -27,8 +27,8 @@ tf-ai = "tf_mcp:main_ai"
 
 [tool.setuptools]
 py-modules = ["tf_backend", "tf_mcp"]
-packages = ["tf_wiki"]
+packages = ["textfolding"]
 
 [tool.setuptools.package-data]
-tf_wiki = ["*.md", "*.tf"]
+textfolding = ["ai.tf", "user_man.txt"]
 

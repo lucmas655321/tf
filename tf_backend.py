@@ -2470,9 +2470,11 @@ def _show_manual(mode: str = "human"):
     mode="learning" → training only
     """
     base   = os.path.dirname(os.path.realpath(__file__))
-    manual = os.path.join(base, "tf_wiki", "manual.md")
+    manual = os.path.join(base, "user_man.txt")
     if not os.path.exists(manual):
-        print("Manual not found:", manual, file=sys.stderr); return
+        manual = os.path.join(base, "textfolding", "user_man.txt")
+    if not os.path.exists(manual):
+        print("Manual not found — reinstall textfolding (pip install git+https://github.com/lucmas655321/tf)", file=sys.stderr); return
     lines = open(manual).readlines()
     root  = parse(lines)
     open_tag, close_tag = tags_for_file(manual)

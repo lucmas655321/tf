@@ -1,0 +1,148 @@
+#[of]: root
+TextFolding User Manual
+
+TF is a structural navigation system for text files using labeled block markers (#[of]: / #[cf]).
+
+#[cf]
+
+#[of]: installation
+Install TF as a Python package:
+
+  pip install -e .
+
+TF is now available as both a Python library and an MCP server.
+#[cf]
+
+#[of]: quick_start
+Basic usage pattern:
+
+  1. Initialize project (once): tf_initProject(cwd=/path/to/project)
+  2. Navigate structure: tf_tree(path="file.py")
+  3. Read block: tf_getBlockContent(path="file.py@root/Class/method")
+  4. Edit block: tf_replaceInBlock(path="file.py@root/Class/method", old_str="...", new_str="...")
+
+Project root is auto-detected from os.getcwd() for most operations.
+#[cf]
+
+#[of]: mcp_server
+Start the MCP server:
+
+  python -m tf_mcp
+
+The server exposes a single tf(cmd) tool where cmd is a JSON string:
+
+  tf('{"tool":"tf_tree","path":"file.py"}')
+  tf('{"tool":"tf_getBlockContent","path":"file.py@root/Class/method"}')
+
+This is the recommended interface for AI assistants.
+#[cf]
+
+#[of]: python_api
+Direct Python API usage:
+
+  import tf_mcp as tf
+
+  # Navigate structure
+  result = tf.tf_tree(path="file.py")
+  result = tf.tf_tree(path="file.py@root/Class/method")
+
+  # Read block content
+  result = tf.tf_getBlockContent(path="file.py@root/Class/method")
+
+  # Edit block
+  result = tf.tf_replaceInBlock(
+      path="file.py@root/Class/method",
+      old_str="old code",
+      new_str="new code"
+  )
+#[cf]
+
+#[of]: path_syntax
+Path syntax for TF operations:
+
+  file.py              = whole file overview
+  file.py@root         = file structure
+  file.py@root/Class   = class block
+  file.py@root/Class/method = method block
+
+The @ symbol separates the file path from the block path within that file.
+#[cf]
+
+#[of]: core_tools
+Essential tools for most operations:
+
+  tf_tree              - Navigate file/block hierarchy
+  tf_getBlockContent   - Read block text (supports batch with comma-separated paths)
+  tf_search            - Search for patterns (supports grep-like mode)
+  tf_replaceInBlock    - Surgical find+replace inside block
+  tf_addBlock          - Add new sibling block
+
+For AI usage, see ai.tf (the AI manual with rules and examples).
+#[cf]
+
+#[of]: tf_miller
+tf_miller controls the Miller UI (VSCode webview) via HTTP RPC on port 7891.
+
+Requires: VSCode must be open with MillerPanel active.
+
+Signature: tf('{"tool":"tf_miller","cmd":"<command>","path":...,"block":...,"text":...}')
+
+Parameters:
+  cmd    - Command to execute (required)
+  path   - File path (for 'open' command)
+  block  - Block path (for 'open' or 'focus' command)
+  text   - Text content (for certain commands)
+  action - Action name (for 'command' cmd)
+
+Commands:
+  cmd='state'    - Get current webview state (path, history, editMode)
+  cmd='open'     - Open a file and navigate to a block
+  cmd='focus'    - Focus on a block in the already-open file
+  cmd='propose'  - Show diff in propose-mode, waits for human Apply/Discard
+  cmd='command'  - Execute an action: enterEdit, saveText, historyBack, etc.
+
+Examples:
+  # Open file at specific block
+  tf('{"tool":"tf_miller","cmd":"open","path":"file.py@root/Class/method"}')
+
+  # Get current state
+  tf('{"tool":"tf_miller","cmd":"state"}')
+
+  # Show proposed changes (interactive)
+  tf('{"tool":"tf_miller","cmd":"propose"}')
+
+  # Execute action
+  tf('{"tool":"tf_miller","cmd":"command","action":"saveText"}')
+
+tf_miller provides an interactive UI for exploring and editing TF files.
+#[cf]
+
+#[of]: project_structure
+TF projects use .tf/ directory for configuration:
+
+  .tf/
+    components.tf  - Project structure definition
+    config.tf      - Project settings
+
+The components.tf file defines the logical structure of your project, enabling cross-file navigation.
+#[cf]
+
+#[of]: onboarding
+Convert existing (non-TF) files to TF format:
+
+  tf_onboard(path="file.py", write=True)
+
+This automatically wraps classes and functions with #[of]: / #[cf] markers.
+
+For large codebases, use tf_audit to identify files that need onboarding:
+
+  tf_audit(path=".", threshold=20)
+#[cf]
+
+#[of]: testing
+Run TF tests:
+
+  bash test/run_all.sh
+
+This runs all test suites (core, mcp, backend).
+#[cf]

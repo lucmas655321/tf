@@ -1729,7 +1729,10 @@ def tf_man(topic: str = "", level: int = 1) -> str:
     base = os.path.dirname(os.path.realpath(__file__))
     manual = os.path.join(base, "ai.tf")
     if not os.path.exists(manual):
-        return f"Manual not found at {manual} — reinstall textfolding (pip install -e .)."
+        # installed package: ai.tf lives in the textfolding/ sub-package
+        manual = os.path.join(base, "textfolding", "ai.tf")
+    if not os.path.exists(manual):
+        return f"Manual not found — reinstall textfolding (pip install git+https://github.com/lucmas655321/tf)."
 
     flines = open(manual).readlines()
     ot, ct = tags_for_file(manual)
@@ -2039,7 +2042,10 @@ def tf_initProject(cwd: str) -> dict:
 #tf:ref archive/wiki_legacy_2026-04-21/  (wiki_index rimosso — KISS: nessun wiki nei workspace)
 #[of]: _public_server
 _TF_WIKI_ROOT = os.path.dirname(os.path.realpath(__file__))
-_BOOTSTRAP_PATH = os.path.join(_TF_WIKI_ROOT, "ai.tf") + "@root/bootstrap_lite"
+_AI_TF = (os.path.join(_TF_WIKI_ROOT, "ai.tf")
+          if os.path.exists(os.path.join(_TF_WIKI_ROOT, "ai.tf"))
+          else os.path.join(_TF_WIKI_ROOT, "textfolding", "ai.tf"))
+_BOOTSTRAP_PATH = _AI_TF + "@root/bootstrap_lite"
 _BOOTSTRAP_FALLBACK = (
     'TextFolding — tf({"tool":"<name>",...kwargs})\n'
     'Call tf(\'{"tool":"tf_man","topic":""}\') for the bootstrap.\n'

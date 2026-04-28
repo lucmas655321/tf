@@ -1,1 +1,3 @@
-recursive-include tf_wiki *.md
+include ai.tf
+include user_man.txt
+recursive-include textfolding *.tf *.txt
