@@ -98,7 +98,7 @@ Correctness was identical across all runs. In a separate multi-file test (6 task
 
 ## Miller
 
-Miller is the VSCode port of Code Browser's column navigation — useful independently of any AI integration. If you've used Code Browser and missed it in your IDE, this is it.
+Miller is the VSCode port of Code Browser's column navigation — useful independently of any AI integration. If you've used Code Browser and missed it in your IDE, this is it. Miller is largely (though not fully) compatible with Code Browser's marker format, so existing annotated files work without conversion.
 
 **Install (2 steps):**
 
@@ -111,6 +111,8 @@ code --install-extension vscode-textfolding-0.1.0.vsix
 ```
 
 Open with `Ctrl+Alt+M` (Mac: `Cmd+Alt+M`).
+
+Miller is also a standalone code browser — no AI required. When the source file is open alongside Miller, clicking a block in Miller scrolls the editor to the exact corresponding line. This gives you a two-panel navigation experience: the column view for structure, the editor for context and editing. Think of it as a persistent, clickable outline that controls your cursor.
 
 The AI and Miller share the same file view:
 - When the AI edits a block, Miller reflects it immediately
@@ -160,7 +162,7 @@ Then tell your AI: *"Call tf('') to read the TF manual, then help me with..."*
 
 Pre-release (0.1.0). The marker format and core protocol are stable; the tool API may change. Not yet on PyPI.
 
-This is a proof of concept — functional, tested, used daily on this codebase, but not production-hardened.
+This is a proof of concept — functional, tested, used daily on this codebase, but not production-hardened. Built by one person with Claude as a collaborator: the AI wrote significant portions of the code under human direction, which is itself a demonstration of the workflow this tool is designed to support.
 
 ---
 
