@@ -8,9 +8,13 @@ TF is a structural navigation system for text files using labeled block markers 
 #[of]: installation
 Install TF as a Python package:
 
-  pip install -e .
+  pip install textfolding
 
-TF is now available as both a Python library and an MCP server.
+Or directly from source:
+
+  pip install git+https://github.com/lucmas655321/tf
+
+TF is now available as both a CLI and an MCP server.
 #[cf]
 
 #[of]: quick_start
@@ -25,9 +29,16 @@ Project root is auto-detected from os.getcwd() for most operations.
 #[cf]
 
 #[of]: mcp_server
-Start the MCP server:
+Add to .mcp.json in your project root:
 
-  python -m tf_mcp
+  {
+    "mcpServers": {
+      "textfolding": {
+        "command": "tf-mcp",
+        "cwd": "/path/to/your/project"
+      }
+    }
+  }
 
 The server exposes a single tf(cmd) tool where cmd is a JSON string:
 
