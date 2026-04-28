@@ -100,6 +100,18 @@ Correctness was identical across all runs. In a separate multi-file test (6 task
 
 Miller is the VSCode port of Code Browser's column navigation — useful independently of any AI integration. If you've used Code Browser and missed it in your IDE, this is it.
 
+**Install (2 steps):**
+
+1. Download [`vscode-textfolding-0.1.0.vsix`](vscode-textfolding-0.1.0.vsix)
+2. In VSCode: `Extensions` → `...` → `Install from VSIX…` → select the file
+
+Or from the terminal:
+```bash
+code --install-extension vscode-textfolding-0.1.0.vsix
+```
+
+Open with `Ctrl+Alt+M` (Mac: `Cmd+Alt+M`).
+
 The AI and Miller share the same file view:
 - When the AI edits a block, Miller reflects it immediately
 - In **Propose Mode**, the AI sends a diff and waits — Miller shows `+`/`−` lines, you click ✓ Apply or ✗ Discard before anything is written
@@ -156,7 +168,7 @@ This is a proof of concept — functional, tested, used daily on this codebase, 
 
 - Python 3.10+, `mcp>=1.0` (`tf_backend.py` itself has zero dependencies)
 - An MCP-compatible AI assistant (Claude Code, Cursor, Windsurf, Claude Desktop, etc.)
-- VSCode for Miller (not yet on the marketplace — build from `vscode-textfolding/` with `npm install && npm run compile`)
+- VSCode for Miller (`.vsix` in the repo root — see [Miller](#miller) section)
 
 ---
 
