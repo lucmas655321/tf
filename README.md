@@ -160,7 +160,7 @@ Then tell your AI: *"Call tf('') to read the TF manual, then help me with..."*
 
 ## Status
 
-Pre-release (0.1.0). The marker format and core protocol are stable; the tool API may change. Not yet on PyPI.
+Pre-release (0.1.0). The marker format and core protocol are stable; the tool API may change. Not yet on PyPI — install via `pip install git+https://github.com/lucmas655321/tf`.
 
 This is a proof of concept — functional, tested, used daily on this codebase, but not production-hardened. Built by one person with Claude as a collaborator: the AI wrote significant portions of the code under human direction, which is itself a demonstration of the workflow this tool is designed to support.
 
