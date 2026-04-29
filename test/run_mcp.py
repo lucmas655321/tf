@@ -861,6 +861,21 @@ r = m.tf_man(topic="errors")
 ok("MA10 errors ha block not found", r,
    lambda v: "block not found" in v)
 
+# MA11 tf_tree l1 — firma e esempio presenti, no # header, no JSON wrap.
+r = m.tf_man(topic="tf_tree", level=1)
+ok("MA11 tf_tree l1 firma + no # header + no JSON wrap", r,
+   lambda v: "tf_tree" in v and "firma:" in v and not v.strip().startswith("#") and not v.strip().startswith('{"result"'))
+
+# MA12 tf_editText l1 — firma e hard rule R1.
+r = m.tf_man(topic="tf_editText", level=1)
+ok("MA12 tf_editText l1 firma + R1 menzione", r,
+   lambda v: "tf_editText" in v and "firma:" in v and "R1" in v)
+
+# MA13 topic=tf_tree level=2 — contiene auto-depth e show_path.
+r = m.tf_man(topic="tf_tree", level=2)
+ok("MA13 tf_tree l2 contiene auto-depth e show_path", r,
+   lambda v: "auto-depth" in v and "show_path" in v)
+
 # ---------------------------------------------------------------------------
 # ROOT ESPLICITO
 # ---------------------------------------------------------------------------
