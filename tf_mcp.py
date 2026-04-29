@@ -2044,8 +2044,7 @@ def tf_initProject(cwd: str) -> dict:
 #[cf]
 #tf:ref archive/wiki_legacy_2026-04-21/  (wiki_index rimosso — KISS: nessun wiki nei workspace)
 #[of]: _public_server
-_TF_WIKI_ROOT = os.path.dirname(os.path.realpath(__file__))
-_AI_TF = os.path.join(_TF_WIKI_ROOT, "textfolding", "ai.tf")
+_AI_TF = os.path.join(os.path.dirname(os.path.realpath(__file__)), "textfolding", "ai.tf")
 _BOOTSTRAP_PATH = _AI_TF + "@root/bootstrap_lite"
 _BOOTSTRAP_FALLBACK = (
     'TextFolding — tf({"tool":"<name>",...kwargs})\n'
