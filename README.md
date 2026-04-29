@@ -55,7 +55,7 @@ tf_getBlockContent("app.py@root/dispatch") →  target block (~80 tokens)
 tf_editText("app.py@root/dispatch", fix)   →  done
 ```
 
-Markers are valid comments in every host language. `tf_strip` removes them all and leaves the original file unchanged.
+Markers follow each language's comment syntax (`#` Python, `//` JS/TS, `<!--` HTML/MD, etc.) — invisible to compilers and linters, no tooling changes required. Custom markers supported for any format. `tf_strip` removes them all and leaves the original file unchanged.
 
 ---
 
