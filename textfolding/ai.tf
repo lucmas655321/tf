@@ -1,6 +1,6 @@
 #[of]: root
 #[of]: bootstrap
-version: 2026-04-29 19:20
+version: 2026-04-29 19:42
 tf reads/edits structured files via labeled block tags (managed by TF).
 Project root is auto-detected — do not call tf_check_env / tf_initProject.
 
@@ -89,7 +89,8 @@ Multi-line strings in cmd values: use \n for newlines.
 
 advanced:
 
-23 more tools exist (wrap, onboard, audit, move, rename, session, ...).
+To add TF structure to an unstructured file: tf_onboard(path, write=False) → preview, then write=True.
+23 more tools exist (wrap, audit, move, rename, session, ...).
 Not needed for typical read/edit tasks; ignore unless an error suggests one.
 #[cf]
 #[of]: principles
