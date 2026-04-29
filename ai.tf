@@ -31,6 +31,7 @@ Manual sections (tf_tree on this file): principles, tools, flows, errors.
 #[of]: bootstrap_lite
 tf reads/edits structured files via labeled block tags.
 One tool: tf(cmd) where cmd is a JSON string.
+Example: tf({"tool":"tf_tree","path":"file.py"})
 Project root: set TF_PROJECT_ROOT env var in .mcp.json, or call tf({"cwd":"/abs/path"}) once at session start.
 
 Path:  file@root/Class/method

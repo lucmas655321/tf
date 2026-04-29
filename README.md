@@ -162,7 +162,13 @@ Add to `.mcp.json` in your project root:
 }
 ```
 
-Then tell your AI: *"Call tf('') to read the TF manual, then help me with..."*
+If your client doesn't support `cwd` in MCP config (e.g. Windsurf), omit it and tell the AI to set the project root explicitly at the start of each session:
+
+```
+Call tf({"cwd":"/path/to/your/project"}) to set the project root, then help me with...
+```
+
+Otherwise just tell your AI: *"Call tf('') to read the TF manual, then help me with..."*
 
 ### Key tools
 
