@@ -75,7 +75,7 @@ In a long session, every token accumulated in context eventually forces a **comp
 
 Correctness was identical across all runs. In a separate multi-file test (6 tasks, two similar files open), standard mode edited the wrong file 33% of the time. TF: 0%.
 
-> **These are early numbers from a proof of concept.** Sample sizes are small (3 runs each). We publish them as a directional signal, not a definitive claim. Independent replication is welcome.
+> **These are early numbers from a proof of concept.** Each data point is 3 runs of 15-prompt sessions — not a large sample, but not a trivial one either. We publish them as a directional signal; independent replication is welcome.
 
 ---
 
