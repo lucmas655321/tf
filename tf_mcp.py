@@ -1786,7 +1786,7 @@ def tf_man(topic: str = "", level: int = 1) -> str:
         for c in tool.children:
             if c.label == target:
                 body = _render(c)
-                header = f"# {topic} — {target}"
+                header = f"{topic} — {target}"
                 if target != f"l{level}":
                     header += f"  (requested l{level}, returned highest available)"
                 return header + "\n" + body
