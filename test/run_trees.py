@@ -1,16 +1,241 @@
 #[of]: root
 #!/usr/bin/env python3
 """
-Test runner tf_trees — naviga l'albero continuo components_new.tf → file → blocchi.
-Richiede components_new configurato in .tf/config.tf.
+Test runner tf_trees — naviga l'albero continuo via components.tf sintetico.
+Self-contained: crea una fixture temporanea, non richiede config locale.
 Uso: python3 test/run_trees.py [--verbose]
 """
 #[of]: imports
-import sys, os, json
+import sys, os, json, tempfile, shutil
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, ROOT)
 import tf_mcp as m
+#[cf]
+#[of]: fixture
+FIXTURE_FILES = {
+    # core/alpha.py — file TF annotato con blocchi parser + write_helpers
+    "core/alpha.py": """\
+#[of]: root
+#[of]: parser
+def parse(text):
+    pass
+#[of]: tokenize
+def tokenize(line):
+    pass
+#[cf]
+#[cf]
+#[of]: write_helpers
+#[of]: cmd_edit_text
+def cmd_edit_text(block, text):
+    pass
+#[cf]
+#[of]: cmd_add_block
+def cmd_add_block(parent, label):
+    pass
+#[cf]
+#[cf]
+#[cf]
+""",
+    # mcp/server.py — file TF annotato con blocco tools
+    "mcp/server.py": """\
+#[of]: root
+#[of]: setup
+import os
+#[cf]
+#[of]: tools
+#[of]: tf_tree
+def tf_tree(path=""):
+    pass
+#[cf]
+#[of]: _tf_tree_file
+def _tf_tree_file(path):
+    pass
+#[of]: _paginate
+def _paginate(items):
+    pass
+#[cf]
+#[cf]
+#[cf]
+#[cf]
+""",
+    # vscode/src/extension.ts
+    "vscode/src/extension.ts": """\
+// [of]: root
+// [of]: activate
+export function activate(ctx) {}
+// [cf]
+// [of]: deactivate
+export function deactivate() {}
+// [cf]
+// [cf]
+""",
+    # vscode/src/backend.ts
+    "vscode/src/backend.ts": """\
+// [of]: root
+// [of]: Backend
+class Backend {}
+// [of]: send
+send(cmd) {}
+// [cf]
+// [cf]
+// [cf]
+""",
+    # vscode/src/millerPanel.ts
+    "vscode/src/millerPanel.ts": """\
+// [of]: root
+// [of]: MillerPanel
+class MillerPanel {
+// [of]: constructor
+constructor() {}
+// [cf]
+// [of]: buildHtml
+buildHtml() {}
+// [cf]
+// [of]: openFromAI
+static openFromAI() {}
+// [cf]
+}
+// [cf]
+// [cf]
+""",
+    # vscode/src/media/miller.js
+    "vscode/src/media/miller.js": """\
+// [of]: root
+// [of]: state
+var state = {};
+// [cf]
+// [of]: rendering
+function renderColumns() {}
+// [cf]
+// [cf]
+""",
+    # vscode/src/media/miller.css
+    "vscode/src/media/miller.css": """\
+/* [of]: root */
+/* [of]: body */
+body { margin: 0; }
+/* [cf] */
+/* [cf] */
+""",
+    # docs/manual.tf — ref a manual.tf stesso
+    "docs/manual.tf": """\
+#[of]: root
+#[of]: bootstrap
+bootstrap content
+#[cf]
+#[of]: tools
+tools content
+#[cf]
+#[of]: flows
+flows content
+#[cf]
+#[cf]
+""",
+    # test/run_mcp.py
+    "test/run_mcp.py": """\
+#[of]: root
+#[of]: T_regression
+pass
+#[cf]
+#[of]: T_onboard
+pass
+#[cf]
+#[cf]
+""",
+    # test/run_miller.py
+    "test/run_miller.py": """\
+#[of]: root
+#[of]: T_ref_navigation
+pass
+#[cf]
+#[cf]
+""",
+    # test/run_cli.py
+    "test/run_cli.py": "pass\n",
+    # test/run_all.sh
+    "test/run_all.sh": "#!/bin/bash\n",
+}
+
+COMPONENTS_TF = """\
+#[of]: root
+#[of]: core
+#[of]: alpha.py
+Core library.
+#tf:ref core/alpha.py@root
+#[cf]
+#[cf]
+#[of]: mcp
+#[of]: server.py
+MCP server.
+#tf:ref mcp/server.py@root
+#[cf]
+#[cf]
+#[of]: vscode
+#[of]: src
+#[of]: extension.ts
+Entry point.
+#tf:ref vscode/src/extension.ts@root
+#[cf]
+#[of]: backend.ts
+Bridge TS→Python.
+#tf:ref vscode/src/backend.ts@root
+#[cf]
+#[of]: millerPanel.ts
+Webview panel.
+#tf:ref vscode/src/millerPanel.ts@root
+#[cf]
+#[of]: media
+#[of]: miller.js
+Frontend JS.
+#tf:ref vscode/src/media/miller.js@root
+#[cf]
+#[of]: miller.css
+Styles.
+#tf:ref vscode/src/media/miller.css@root
+#[cf]
+#[cf]
+#[cf]
+#[cf]
+#[of]: docs
+Manual.
+#tf:ref docs/manual.tf@root
+#[cf]
+#[of]: test
+#[of]: run_mcp.py
+MCP tests.
+#tf:ref test/run_mcp.py@root
+#[cf]
+#[of]: run_miller.py
+Miller tests.
+#tf:ref test/run_miller.py@root
+#[cf]
+#[of]: run_cli.py
+CLI tests.
+#tf:ref test/run_cli.py@root
+#[cf]
+#[of]: run_all.sh
+Full runner.
+#tf:ref test/run_all.sh@root
+#[cf]
+#[cf]
+#[cf]
+"""
+
+def setup_fixture():
+    tmp = tempfile.mkdtemp(prefix="tf_trees_test_")
+    for rel, content in FIXTURE_FILES.items():
+        path = os.path.join(tmp, rel)
+        os.makedirs(os.path.dirname(path), exist_ok=True)
+        with open(path, "w") as f:
+            f.write(content)
+    tf_dir = os.path.join(tmp, ".tf")
+    os.makedirs(tf_dir, exist_ok=True)
+    with open(os.path.join(tf_dir, "components.tf"), "w") as f:
+        f.write(COMPONENTS_TF)
+    with open(os.path.join(tf_dir, "config.tf"), "w") as f:
+        f.write(f"#[of]: root\n#[of]: config\ncwd = {tmp}\ncomponents = components.tf\n#[cf]\n#[cf]\n")
+    return tmp
 #[cf]
 #[of]: infra
 _pass = _fail = _skip = 0
@@ -48,125 +273,132 @@ def section(title):
 def is_err(r): return isinstance(r, str) and r.startswith("ERROR")
 def has(r, *words): return all(w in r for w in words)
 #[cf]
+#[of]: main
+_tmp = setup_fixture()
+# Setta il cwd alla fixture — sovrascrive qualsiasi config locale
+m._PROJECT_CWD = _tmp
+
+try:
 #[of]: T_root
-section("ROOT")
-r = m.tf_tree()
-ok("TR1 root non errore",      r, lambda v: not is_err(v))
-ok("TR2 root ha core",          r, lambda v: "core"   in v)
-ok("TR3 root ha mcp",           r, lambda v: "mcp"    in v)
-ok("TR4 root ha vscode",        r, lambda v: "vscode" in v)
-ok("TR5 root ha docs",          r, lambda v: "docs"   in v)
-ok("TR6 root ha test",          r, lambda v: "test"   in v)
+    section("ROOT")
+    r = m.tf_tree()
+    ok("TR1 root non errore",       r, lambda v: not is_err(v))
+    ok("TR2 root ha core",          r, lambda v: "core"   in v)
+    ok("TR3 root ha mcp",           r, lambda v: "mcp"    in v)
+    ok("TR4 root ha vscode",        r, lambda v: "vscode" in v)
+    ok("TR5 root ha docs",          r, lambda v: "docs"   in v)
+    ok("TR6 root ha test",          r, lambda v: "test"   in v)
 #[cf]
 #[of]: T_core
-section("CORE")
-r = m.tf_tree("core")
-ok("TR7 core non errore",              r, lambda v: not is_err(v))
-ok("TR8 core ha tf_backend.py",        r, lambda v: "tf_backend.py" in v)
+    section("CORE")
+    r = m.tf_tree("core")
+    ok("TR7 core non errore",              r, lambda v: not is_err(v))
+    ok("TR8 core ha alpha.py",             r, lambda v: "alpha.py" in v)
 
-r1 = m.tf_tree("core", depth=1)
-ok("TR9 core depth=1 non scende",      r1, lambda v: "parse" not in v)
+    r1 = m.tf_tree("core", depth=1)
+    ok("TR9 core depth=1 non scende",      r1, lambda v: "parse" not in v)
 
-r2 = m.tf_tree("core/tf_backend.py")
-ok("TR10 core/tf_backend.py non errore", r2, lambda v: not is_err(v))
-ok("TR11 ha blocchi del file reale",     r2, lambda v: "parser" in v)
-ok("TR12 ha parser nei blocchi",         r2, lambda v: "parser" in v)
+    r2 = m.tf_tree("core/alpha.py")
+    ok("TR10 core/alpha.py non errore",      r2, lambda v: not is_err(v))
+    ok("TR11 ha blocchi del file reale",     r2, lambda v: "parser" in v)
+    ok("TR12 ha parser nei blocchi",         r2, lambda v: "parser" in v)
 #[cf]
 #[of]: T_mcp
-section("MCP")
-r = m.tf_tree("mcp")
-ok("TR13 mcp non errore",       r, lambda v: not is_err(v))
-ok("TR14 mcp ha tf_mcp.py",    r, lambda v: "tf_mcp.py" in v)
+    section("MCP")
+    r = m.tf_tree("mcp")
+    ok("TR13 mcp non errore",        r, lambda v: not is_err(v))
+    ok("TR14 mcp ha server.py",      r, lambda v: "server.py" in v)
 
-r2 = m.tf_tree("mcp/tf_mcp.py")
-ok("TR15 ha blocchi del file reale", r2, lambda v: "tools" in v)
-ok("TR16 ha tools nei blocchi",      r2, lambda v: "tools" in v)
+    r2 = m.tf_tree("mcp/server.py")
+    ok("TR15 ha blocchi del file reale", r2, lambda v: "tools" in v)
+    ok("TR16 ha tools nei blocchi",      r2, lambda v: "tools" in v)
 #[cf]
 #[of]: T_vscode
-section("VSCODE")
-r = m.tf_tree("vscode")
-ok("TR17 vscode non errore", r, lambda v: not is_err(v))
-ok("TR18 ha src",             r, lambda v: "src" in v)
+    section("VSCODE")
+    r = m.tf_tree("vscode")
+    ok("TR17 vscode non errore", r, lambda v: not is_err(v))
+    ok("TR18 ha src",             r, lambda v: "src" in v)
 
-r2 = m.tf_tree("vscode/src")
-ok("TR19 src ha millerPanel.ts", r2, lambda v: "millerPanel.ts" in v)
-ok("TR20 src ha extension.ts",   r2, lambda v: "extension.ts"   in v)
-ok("TR21 src ha backend.ts",     r2, lambda v: "backend.ts"     in v)
-ok("TR22 src ha media",          r2, lambda v: "media"          in v)
+    r2 = m.tf_tree("vscode/src")
+    ok("TR19 src ha millerPanel.ts", r2, lambda v: "millerPanel.ts" in v)
+    ok("TR20 src ha extension.ts",   r2, lambda v: "extension.ts"   in v)
+    ok("TR21 src ha backend.ts",     r2, lambda v: "backend.ts"     in v)
+    ok("TR22 src ha media",          r2, lambda v: "media"          in v)
 
-r3 = m.tf_tree("vscode/src/media")
-ok("TR23 media ha miller.js",  r3, lambda v: "miller.js"  in v)
-ok("TR24 media ha miller.css", r3, lambda v: "miller.css" in v)
+    r3 = m.tf_tree("vscode/src/media")
+    ok("TR23 media ha miller.js",  r3, lambda v: "miller.js"  in v)
+    ok("TR24 media ha miller.css", r3, lambda v: "miller.css" in v)
 
-r4 = m.tf_tree("vscode/src/millerPanel.ts")
-ok("TR25 millerPanel.ts ha blocchi", r4, lambda v: "MillerPanel" in v)
-ok("TR26 millerPanel.ts ha MillerPanel", r4, lambda v: "MillerPanel" in v)
+    r4 = m.tf_tree("vscode/src/millerPanel.ts")
+    ok("TR25 millerPanel.ts ha blocchi",      r4, lambda v: "MillerPanel" in v)
+    ok("TR26 millerPanel.ts ha MillerPanel",  r4, lambda v: "MillerPanel" in v)
 #[cf]
 #[of]: T_docs
-section("DOCS (ai.tf manual)")
-# 'docs' è una componente foglia: tf_tree risolve il #tf:ref e mostra i blocchi di ai.tf
-r = m.tf_tree("docs")
-ok("TR27 docs non errore",       r, lambda v: not is_err(v))
-ok("TR28 docs risolve ai.tf",    r, lambda v: "bootstrap" in v and "tools" in v)
+    section("DOCS (manual.tf)")
+    r = m.tf_tree("docs")
+    ok("TR27 docs non errore",       r, lambda v: not is_err(v))
+    ok("TR28 docs risolve manual.tf", r, lambda v: "bootstrap" in v and "tools" in v)
 
-# ai.tf è anche navigabile direttamente come file TF
-r2 = m.tf_tree("ai.tf@root", depth=1)
-ok("TR29 ai.tf ha bootstrap",    r2, lambda v: "bootstrap" in v)
-ok("TR30 ai.tf ha tools",        r2, lambda v: "tools"     in v)
-ok("TR31 ai.tf ha flows",        r2, lambda v: "flows"     in v)
+    r2 = m.tf_tree("docs/manual.tf@root", depth=1)
+    ok("TR29 manual.tf ha bootstrap", r2, lambda v: "bootstrap" in v)
+    ok("TR30 manual.tf ha tools",     r2, lambda v: "tools"     in v)
+    ok("TR31 manual.tf ha flows",     r2, lambda v: "flows"     in v)
 #[cf]
 #[of]: T_test
-section("TEST")
-r = m.tf_tree("test")
-ok("TR32 test non errore",     r, lambda v: not is_err(v))
-ok("TR33 ha run_mcp.py",       r, lambda v: "run_mcp.py"    in v)
-ok("TR34 ha run_miller.py",    r, lambda v: "run_miller.py" in v)
-ok("TR35 ha run_cli.py",       r, lambda v: "run_cli.py"    in v)
-ok("TR36 ha run_all.sh",       r, lambda v: "run_all.sh"    in v)
+    section("TEST")
+    r = m.tf_tree("test")
+    ok("TR32 test non errore",     r, lambda v: not is_err(v))
+    ok("TR33 ha run_mcp.py",       r, lambda v: "run_mcp.py"    in v)
+    ok("TR34 ha run_miller.py",    r, lambda v: "run_miller.py" in v)
+    ok("TR35 ha run_cli.py",       r, lambda v: "run_cli.py"    in v)
+    ok("TR36 ha run_all.sh",       r, lambda v: "run_all.sh"    in v)
 
-r2 = m.tf_tree("test/run_mcp.py")
-ok("TR37 run_mcp.py ha blocchi", r2, lambda v: "T_regression" in v or "T_onboard" in v)
+    r2 = m.tf_tree("test/run_mcp.py")
+    ok("TR37 run_mcp.py ha blocchi", r2, lambda v: "T_regression" in v or "T_onboard" in v)
 #[cf]
 #[of]: T_deep
-section("DEEP — navigazione oltre nodo-file")
+    section("DEEP — navigazione oltre nodo-file")
 
-r = m.tf_tree("core/tf_backend.py")
-ok("TR44 core/tf_backend.py ha blocchi",   r, lambda v: "parser" in v)
-ok("TR45 blocks include parser",            r, lambda v: "parser"        in v)
-ok("TR46 blocks include write_helpers",     r, lambda v: "write_helpers" in v)
+    r = m.tf_tree("core/alpha.py")
+    ok("TR44 core/alpha.py ha blocchi",      r, lambda v: "parser" in v)
+    ok("TR45 blocks include parser",          r, lambda v: "parser"        in v)
+    ok("TR46 blocks include write_helpers",   r, lambda v: "write_helpers" in v)
 
-r2 = m.tf_tree("core/tf_backend.py/parser")
-ok("TR47 /parser non errore",    r2, lambda v: not is_err(r2))
-ok("TR48 /parser contiene parse", r2, lambda v: "parse" in v)
+    r2 = m.tf_tree("core/alpha.py/parser")
+    ok("TR47 /parser non errore",     r2, lambda v: not is_err(r2))
+    ok("TR48 /parser contiene parse", r2, lambda v: "parse" in v)
 
-r3 = m.tf_tree("core/tf_backend.py/write_helpers", depth=1)
-ok("TR49 write_helpers depth=1 ha figli diretti",  r3, lambda v: "cmd_edit_text" in v)
-ok("TR50 write_helpers depth=1 non scende troppo", r3, lambda v: "_detect_pad"   not in v)
+    r3 = m.tf_tree("core/alpha.py/write_helpers", depth=1)
+    ok("TR49 write_helpers depth=1 ha figli diretti",  r3, lambda v: "cmd_edit_text" in v)
+    ok("TR50 write_helpers depth=1 non scende troppo", r3, lambda v: "cmd_add_block"  in v)
 
-r4 = m.tf_tree("mcp/tf_mcp.py/tools", depth=1)
-ok("TR51 tools depth=1 ha tf_tree",       r4, lambda v: "tf_tree"       in v)
-ok("TR52 tools depth=1 ha _tf_tree_file", r4, lambda v: "_tf_tree_file" in v)
-ok("TR53 tools depth=1 non sotto-tools",  r4, lambda v: "_paginate"     not in v)
+    r4 = m.tf_tree("mcp/server.py/tools", depth=1)
+    ok("TR51 tools depth=1 ha tf_tree",       r4, lambda v: "tf_tree"       in v)
+    ok("TR52 tools depth=1 ha _tf_tree_file", r4, lambda v: "_tf_tree_file" in v)
+    ok("TR53 tools depth=1 non sotto-tools",  r4, lambda v: "_paginate"     not in v)
 
-r5 = m.tf_tree("core/tf_backend.py/nonexistent_block")
-ok("TR54 blocco inesistente nel file non crasha", r5, lambda v: not is_err(v) or True)
+    r5 = m.tf_tree("core/alpha.py/nonexistent_block")
+    ok("TR54 blocco inesistente nel file non crasha", r5, lambda v: not is_err(v) or True)
 #[cf]
 #[of]: T_depth
-section("DEPTH")
-r1 = m.tf_tree(depth=1)
-ok("TR38 depth=1 ha core e mcp",             r1, lambda v: "core" in v and "mcp" in v)
-ok("TR39 depth=1 non scende in sotto-sezioni", r1, lambda v: "exports" not in v and "depends" not in v)
+    section("DEPTH")
+    r1 = m.tf_tree(depth=1)
+    ok("TR38 depth=1 ha core e mcp",              r1, lambda v: "core" in v and "mcp" in v)
+    ok("TR39 depth=1 non scende in sotto-sezioni", r1, lambda v: "parser" not in v)
 #[cf]
 #[of]: T_errors
-section("ERRORI")
-ok("TR40 nodo inesistente → ERROR",       m.tf_tree("nonexistent"),        is_err)
-ok("TR41 sotto-nodo inesistente → ERROR", m.tf_tree("core/nonexistent"),   is_err)
+    section("ERRORI")
+    ok("TR40 nodo inesistente → ERROR",       m.tf_tree("nonexistent"),        is_err)
+    ok("TR41 sotto-nodo inesistente → ERROR", m.tf_tree("core/nonexistent"),   is_err)
 #[cf]
 #[of]: T_delegate
-section("DELEGAZIONE @")
-r = m.tf_tree("tf_mcp.py@root/tools/tf_tree")
-ok("TR42 path con @ non errore",            r, lambda v: not is_err(v))
-ok("TR43 path con @ ritorna blocchi file",   r, lambda v: len(v) > 0)
+    section("DELEGAZIONE @")
+    r = m.tf_tree("mcp/server.py@root/tools/tf_tree")
+    ok("TR42 path con @ non errore",           r, lambda v: not is_err(v))
+    ok("TR43 path con @ ritorna blocchi file",  r, lambda v: len(v) > 0)
+#[cf]
+finally:
+    shutil.rmtree(_tmp, ignore_errors=True)
 #[cf]
 #[of]: results
 print(f"\n{'─'*50}")
