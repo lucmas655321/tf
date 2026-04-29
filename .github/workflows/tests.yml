@@ -16,8 +16,8 @@ jobs:
       - name: Install dependencies
         run: pip install mcp
       - name: Run CLI tests
-        run: python3 test/run_cli.py
+        run: python3 test/run_cli.py --fails
       - name: Run MCP tests
-        run: python3 test/run_mcp.py
+        run: python3 test/run_mcp.py --fails
       - name: Run trees tests
-        run: python3 test/run_trees.py
+        run: python3 test/run_trees.py --fails
