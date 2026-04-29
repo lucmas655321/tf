@@ -87,7 +87,12 @@ def _get_project_cwd() -> str | None:
             pass
         return None
 
-    # 1. session override (tf_initProject)
+    # 0. TF_PROJECT_ROOT env var (set in .mcp.json or shell)
+    env_root = os.environ.get("TF_PROJECT_ROOT", "").strip()
+    if env_root and os.path.isdir(env_root):
+        return env_root
+
+    # 1. session override (tf_initProject or tf('{"cwd":"..."}'))
     if _PROJECT_CWD and os.path.isdir(_PROJECT_CWD):
         return _PROJECT_CWD
 
@@ -2093,6 +2098,12 @@ def tf(cmd: str) -> str:
     write tools and errors return JSON. No {"result": ...} wrap.
     """
     if not cmd or not cmd.strip():
+        if _get_project_cwd() is None:
+            return json.dumps({
+                "ok": False,
+                "error": "cwd required",
+                "hint": 'Call tf(\'{"cwd":"/abs/path/to/project"}\') — the AI always knows its working directory.'
+            })
         return _bootstrap()
 
     try:
@@ -2106,6 +2117,17 @@ def tf(cmd: str) -> str:
         return json.dumps({"ok": False,
             "error": f"tf(cmd) expects a JSON object, got {type(data).__name__}.",
             "manual": _safe_man("")})
+
+    # {"cwd": "/path"} — set project root and return bootstrap
+    if "cwd" in data and "tool" not in data:
+        global _PROJECT_CWD
+        cwd = data["cwd"]
+        if not os.path.isabs(cwd):
+            return json.dumps({"ok": False, "error": "cwd must be an absolute path."})
+        if not os.path.isdir(cwd):
+            return json.dumps({"ok": False, "error": f"cwd not found: {cwd}"})
+        _PROJECT_CWD = cwd
+        return _bootstrap()
 
     tool_name = data.pop("tool", None)
     if tool_name is None:

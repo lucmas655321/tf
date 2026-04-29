@@ -31,7 +31,7 @@ Manual sections (tf_tree on this file): principles, tools, flows, errors.
 #[of]: bootstrap_lite
 tf reads/edits structured files via labeled block tags.
 One tool: tf(cmd) where cmd is a JSON string.
-Project root auto-detected from path — no init needed.
+Project root: set TF_PROJECT_ROOT env var in .mcp.json, or call tf('{"cwd":"/abs/path"}') once at session start.
 
 Path:  file@root/Class/method
        file (no @) = whole-file overview
@@ -630,5 +630,10 @@ message -> cause -> fix
 
 "cwd must be an absolute path" (tf_initProject)
   pass os.path.abspath(...).
+
+"cwd required"
+  TF does not know the project root. Fix (pick one):
+  a. Call tf('{"cwd":"/abs/path"}') — sets root for this session.
+  b. Set TF_PROJECT_ROOT env var in .mcp.json: "env": {"TF_PROJECT_ROOT": "/abs/path"}
 #[cf]
 #[cf]
