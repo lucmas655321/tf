@@ -132,10 +132,12 @@ Miller is also a standalone code browser — no AI required. When the source fil
 
 ---
 
-The AI and Miller share the same file view:
-- When the AI edits a block, Miller reflects it immediately
-- In **Propose Mode**, the AI sends a diff and waits — Miller shows `+`/`−` lines, you click ✓ Apply or ✗ Discard before anything is written
-- The AI signals which block it's examining; you can signal your focus back by clicking
+Miller and the AI work on the same block tree. Two optional modes are planned:
+
+- **Follow mode**: when active, the AI moves the Miller cursor to the block it's examining — you always know where it is in the file, not just what it's changing
+- **Propose mode**: instead of writing directly, the AI highlights the target block and describes the intended edit; you confirm before anything is written
+
+The goal is to make AI edits spatially legible: a raw diff tells you *what* changes but not *where in the file* or *why*. With Miller open, the block structure gives you the map — the AI moves inside it.
 
 ---
 
