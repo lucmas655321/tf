@@ -2137,8 +2137,9 @@ def tf(cmd: str) -> str:
             "manual": _safe_man("")})
 
     if tool_name == "tf_man":
-        # public server has one manual: bootstrap_lite. Never delegate to full tf_man.
-        return _bootstrap()
+        topic = data.get("topic", "")
+        level = int(data.get("level", 1))
+        return tf_man(topic=topic, level=level)
 
     if tool_name == "tf_read":
         # AI consistently invents tf_read — alias to tf_getBlockContent

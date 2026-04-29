@@ -1091,10 +1091,31 @@ r = _tf({"tool": "tf_insert_ref", "path": TF + "@root/cap1",
 ok("LT28 tf_insert_ref via lite", r, is_ok)
 _reset()
 
-# tf_man via lite → sempre bootstrap_lite, qualunque topic
+# tf_man via lite: topic='' → bootstrap
+r = _tf_str({"tool": "tf_man"})
+ok("LT29 tf_man via lite bootstrap", r,
+   lambda v: isinstance(v, str) and "tf_tree" in v and "tf_getBlockContent" in v)
+
+# tf_man via lite: topic=tool → contenuto specifico (non bootstrap generico)
 r = _tf_str({"tool": "tf_man", "topic": "tf_search", "level": 1})
-ok("LT29 tf_man via lite → bootstrap_lite", r,
-   lambda v: isinstance(v, str) and len(v) > 0)
+ok("LT29b tf_man topic=tf_search → firma specifica", r,
+   lambda v: "firma:" in v and "pattern" in v)
+
+r = _tf_str({"tool": "tf_man", "topic": "tf_tree", "level": 1})
+ok("LT29c tf_man topic=tf_tree → firma specifica", r,
+   lambda v: "firma:" in v and "depth" in v)
+
+r = _tf_str({"tool": "tf_man", "topic": "tf_editText", "level": 1})
+ok("LT29d tf_man topic=tf_editText → firma specifica", r,
+   lambda v: "firma:" in v and "text" in v)
+
+r = _tf_str({"tool": "tf_man", "topic": "errors"})
+ok("LT29e tf_man topic=errors → error table", r,
+   lambda v: "block not found" in v)
+
+r = _tf_str({"tool": "tf_man", "topic": "flows/f_read"})
+ok("LT29f tf_man topic=flows/f_read → flow content", r,
+   lambda v: "tf_getBlockContent" in v)
 
 # tf_wrapBlocks
 r = _tf({"tool": "tf_wrapBlocks", "path": TF + "@root/cap1",
