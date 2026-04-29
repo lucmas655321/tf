@@ -1720,7 +1720,7 @@ def tf_audit(path: str = ".", threshold: int = 20) -> str:
 #[cf]
 #[cf]
 #[of]: tf_man
-@mcp.tool(annotations=READONLY)
+@mcp.tool(annotations=READONLY, structured_output=False)
 def tf_man(topic: str = "", level: int = 1) -> str:
     """TF AI manual with progressive disclosure.
     topic='' level=1  -> root/bootstrap (~20 lines, start here).
