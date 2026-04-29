@@ -84,7 +84,7 @@ R6. Trace / call-chain questions ("where does X come from?", "who calls Y?"):
 errors:
 
 Reply with {ok:false} may include a "manual" field. Read it before retrying.
-JSON in cmd: use \n for newlines, \" for quotes.
+Multi-line strings in cmd values: use \n for newlines.
 
 advanced:
 
