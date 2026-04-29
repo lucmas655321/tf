@@ -2503,10 +2503,7 @@ def _show_manual(mode: str = "human"):
     mode="ai"       → ai_protocol only
     mode="learning" → training only
     """
-    base   = os.path.dirname(os.path.realpath(__file__))
-    manual = os.path.join(base, "user_man.txt")
-    if not os.path.exists(manual):
-        manual = os.path.join(base, "textfolding", "user_man.txt")
+    manual = os.path.join(os.path.dirname(os.path.realpath(__file__)), "textfolding", "user_man.txt")
     if not os.path.exists(manual):
         print("Manual not found — reinstall textfolding (pip install git+https://github.com/lucmas655321/tf)", file=sys.stderr); return
     lines = open(manual).readlines()
