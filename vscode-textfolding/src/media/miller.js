@@ -1218,6 +1218,24 @@ const bt = document.getElementById('block-text');
 
 ensureUI();
 buildCtxMenu();
+
+// [of]: toggleContentArea
+(function() {
+    const btn = document.createElement('button');
+    btn.id = 'btn-toggle-content';
+    btn.title = 'Toggle code panel';
+    btn.textContent = '▼';
+    btn.style.cssText = 'position:fixed;top:4px;right:6px;z-index:999;padding:1px 6px;font-size:11px;cursor:pointer;background:var(--vscode-button-secondaryBackground,#5a5d5e);color:var(--vscode-button-secondaryForeground,#fff);border:none;opacity:0.7';
+    btn.addEventListener('click', () => {
+        const ca = document.getElementById('content-area');
+        const hidden = ca.style.display === 'none';
+        ca.style.display = hidden ? '' : 'none';
+        btn.textContent = hidden ? '▼' : '▲';
+    });
+    document.body.appendChild(btn);
+})();
+// [cf]
+
 vscode.postMessage({ type: 'ready' });
 // [cf]
 // [cf]
