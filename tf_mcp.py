@@ -2102,7 +2102,7 @@ def tf(cmd: str) -> str:
             return json.dumps({
                 "ok": False,
                 "error": "cwd required",
-                "hint": 'Call tf(\'{"cwd":"/abs/path/to/project"}\') — the AI always knows its working directory.'
+                "manual": _safe_man("errors")
             })
         return _bootstrap()
 
