@@ -20,12 +20,18 @@ body {
 #columns {
     display:     flex;
     flex-direction: row;
-    border-bottom: 1px solid var(--vscode-panel-border);
-    min-height:  30%;
-    max-height:  50%;
     overflow-x:  auto;
     overflow-y:  hidden;
+    min-height:  60px;
 }
+
+#resizer {
+    height:      5px;
+    cursor:      row-resize;
+    background:  var(--vscode-panel-border);
+    flex-shrink: 0;
+}
+#resizer:hover { background: var(--vscode-focusBorder); }
 
 .col {
     min-width:   180px;

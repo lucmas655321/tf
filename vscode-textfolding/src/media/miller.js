@@ -1219,6 +1219,31 @@ const bt = document.getElementById('block-text');
 ensureUI();
 buildCtxMenu();
 
+// [of]: resizer
+(function() {
+    const resizer = document.getElementById('resizer');
+    const columns = document.getElementById('columns');
+    if (!resizer || !columns) { return; }
+    let startY = 0, startH = 0;
+    resizer.addEventListener('mousedown', (e) => {
+        startY = e.clientY;
+        startH = columns.getBoundingClientRect().height;
+        document.addEventListener('mousemove', onMove);
+        document.addEventListener('mouseup', onUp);
+        e.preventDefault();
+    });
+    function onMove(e) {
+        const h = Math.max(60, startH + (e.clientY - startY));
+        columns.style.height = h + 'px';
+        columns.style.maxHeight = 'none';
+    }
+    function onUp() {
+        document.removeEventListener('mousemove', onMove);
+        document.removeEventListener('mouseup', onUp);
+    }
+})();
+// [cf]
+
 // [of]: toggleContentArea
 (function() {
     const btn = document.createElement('button');
