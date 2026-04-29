@@ -536,7 +536,8 @@ function renderContent() {
     renderNavHistory();
 
     document.getElementById('block-header').innerHTML =
-        `<span>${current.label}</span><span class="path">${current.path}</span>`;
+        `<span>${current.label}</span><span class="path">${current.path}</span>`
+        + (!editMode ? '<span class="edit-hint">double-click to edit</span>' : '');
 
     const div = document.getElementById('block-text');
     div.contentEditable = 'false';

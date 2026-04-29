@@ -184,6 +184,14 @@ body {
     gap:         8px;
 }
 
+#block-header .edit-hint {
+    font-size:  0.75em;
+    opacity:    0.35;
+    font-weight: normal;
+    margin-left: auto;
+    font-style: italic;
+}
+
 #block-header .path {
     font-size:  0.85em;
     opacity:    0.6;
