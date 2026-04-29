@@ -116,6 +116,22 @@ Open with `Ctrl+Alt+M` (Mac: `Cmd+Alt+M`).
 
 Miller is also a standalone code browser — no AI required. When the source file is open alongside Miller, clicking a block in Miller scrolls the editor to the exact corresponding line. This gives you a two-panel navigation experience: the column view for structure, the editor for context and editing. Think of it as a persistent, clickable outline that controls your cursor.
 
+### Screenshots
+
+![Miller — base panel](miller/miller.png)
+*Base panel: column-based block structure of a file*
+
+![Miller — cascade view](miller/miller_cascade.png)
+*Cascade view: nested blocks expanded inline*
+
+![Miller — navigation](miller/miller_navigation.png)
+*Navigation: clicking a block scrolls the editor to the exact line*
+
+![Miller — side by side](miller/two_side.png)
+*Side-by-side: editor and Miller panel open together*
+
+---
+
 The AI and Miller share the same file view:
 - When the AI edits a block, Miller reflects it immediately
 - In **Propose Mode**, the AI sends a diff and waits — Miller shows `+`/`−` lines, you click ✓ Apply or ✗ Discard before anything is written
