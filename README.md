@@ -22,7 +22,7 @@ Without TF, an AI agent navigates a large file by trial and error: it calls `Rea
 
 Worse: when the agent finds something that *looks* like the right block, it may edit it without verifying it's the canonical implementation. Duplicates, near-duplicates, similar function names across files — the agent picks one and edits it. Later turns build on that edit. Implementations diverge silently.
 
-TF gives the agent a map. Files embed a lightweight navigable tree using plain comment markers:
+TF gives the agent a map. The text *is* the map — no external index, no build step, no separate tooling. Files embed a lightweight navigable tree using plain comment markers:
 
 ```python
 #[of]: root
@@ -76,6 +76,8 @@ In a long session, every token accumulated in context eventually forces a **comp
 Correctness was identical across all runs. In a separate multi-file test (6 tasks, two similar files open), standard mode edited the wrong file 33% of the time. TF: 0%.
 
 > **These are early numbers from a proof of concept.** Each data point is 3 runs of 15-prompt sessions — not a large sample, but not a trivial one either. We publish them as a directional signal; independent replication is welcome.
+>
+> The benchmark uses a conservative setup: TF runs as a plain MCP server with no system prompt, no platform-specific tuning, and no special agent skills — by design, to keep results portable across AI assistants. The downside is that agents occasionally fall back to native tools or misuse TF in early turns before the protocol is clear. With TF integrated as a first-class system tool, we expect the adoption curve to disappear and the savings to grow — but that is a hypothesis, not a measurement.
 
 ---
 
