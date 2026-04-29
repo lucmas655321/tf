@@ -294,6 +294,40 @@ def get_block(root: Block, path: str) -> Optional[Block]:
     return found
 
 #[cf]
+#[of]: get_block_wild
+def get_block_wild(root: Block, path: str) -> Optional[Block]:
+    """Like get_block but '*' as a path segment matches any single child.
+    Returns the first match. Example: 'root/tools/*/tf_tree/l1'
+    """
+    if not path or path == "root":
+        return root
+    if path.startswith("root/"):
+        path = path[5:]
+    parts = path.split('/')
+
+    def _search(current_children, remaining):
+        if not remaining:
+            return None
+        part = remaining[0]
+        rest = remaining[1:]
+        if part == '*':
+            for child in current_children:
+                if not rest:
+                    return child
+                result = _search(child.children, rest)
+                if result is not None:
+                    return result
+        else:
+            found = next((b for b in current_children if _match_part(b, part)), None)
+            if found is None:
+                return None
+            if not rest:
+                return found
+            return _search(found.children, rest)
+        return None
+
+    return _search(root.children, parts)
+#[cf]
 #[of]: all_levels
 def all_levels(root: Block) -> dict[str, list[str]]:
     result: dict[str, list[str]] = {}

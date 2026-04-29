@@ -8,7 +8,7 @@ import os, sys, json, re
 sys.path.insert(0, os.path.dirname(os.path.realpath(__file__)))
 
 from tf_backend import (
-    parse, get_block, visible_to_physical, tags_for_file, note_tag_for_file, _make_patterns,
+    parse, get_block, get_block_wild, visible_to_physical, tags_for_file, note_tag_for_file, _make_patterns,
     cmd_strip, cmd_edit_text, cmd_init,
     cmd_add_block, cmd_remove_block, cmd_rename_block,
     cmd_duplicate_block, cmd_move_block_to_parent,
@@ -1764,32 +1764,33 @@ def tf_man(topic: str = "", level: int = 1) -> str:
             return f"flow '{topic[6:]}' not found. Available: {flows}"
         return _render(blk)
 
-    # topic='<tool_name>' -> search under root/tools/<group>/<tool>/l<level>
+    # topic='<tool_name>' -> search under root/tools/*/<tool>/l<level>
     tools_root = get_block(root, "root/tools")
     if tools_root is None:
         return "Section root/tools not found in ai.tf."
-    for group in tools_root.children:
-        for tool in group.children:
-            if tool.label == topic:
-                # find highest existing level <= requested level, else highest available
-                available = sorted(
-                    [c.label for c in tool.children if c.label.startswith("l") and c.label[1:].isdigit()],
-                    key=lambda s: int(s[1:]),
-                )
-                if not available:
-                    return _render(tool)
-                target = f"l{level}"
-                if target not in available:
-                    # fallback: highest available <= requested, else max
-                    lower = [x for x in available if int(x[1:]) <= level]
-                    target = lower[-1] if lower else available[-1]
-                for c in tool.children:
-                    if c.label == target:
-                        body = _render(c)
-                        header = f"# {topic} ({group.label}) — {target}"
-                        if target != f"l{level}":
-                            header += f"  (requested l{level}, returned highest available)"
-                        return header + "\n" + body
+
+    # find tool block via wildcard
+    tool = get_block_wild(root, f"root/tools/*/{topic}")
+    if tool is not None:
+        group_label = tool.parent.label if hasattr(tool, 'parent') and tool.parent else "?"
+        available = sorted(
+            [c.label for c in tool.children if c.label.startswith("l") and c.label[1:].isdigit()],
+            key=lambda s: int(s[1:]),
+        )
+        if not available:
+            return _render(tool)
+        target = f"l{level}"
+        if target not in available:
+            lower = [x for x in available if int(x[1:]) <= level]
+            target = lower[-1] if lower else available[-1]
+        for c in tool.children:
+            if c.label == target:
+                body = _render(c)
+                header = f"# {topic} — {target}"
+                if target != f"l{level}":
+                    header += f"  (requested l{level}, returned highest available)"
+                return header + "\n" + body
+
     # unknown topic: list available tools
     tools_list = []
     for group in tools_root.children:
@@ -2227,7 +2228,7 @@ def tf_man_public(topic: str = "", level: int = 1) -> str:
     """TF manual. topic='' -> bootstrap (syntax, tools, quick start).
     topic='<tool_name>' level=1-3 -> tool-specific help.
     """
-    return _bootstrap()
+    return tf_man(topic=topic, level=level)
 #[cf]
 #[cf]
 
