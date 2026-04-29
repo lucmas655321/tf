@@ -1227,9 +1227,12 @@ buildCtxMenu();
     btn.textContent = '▼';
     btn.style.cssText = 'position:fixed;top:4px;right:6px;z-index:999;padding:1px 6px;font-size:11px;cursor:pointer;background:var(--vscode-button-secondaryBackground,#5a5d5e);color:var(--vscode-button-secondaryForeground,#fff);border:none;opacity:0.7';
     btn.addEventListener('click', () => {
-        const ca = document.getElementById('content-area');
+        const ca  = document.getElementById('content-area');
+        const col = document.getElementById('columns');
         const hidden = ca.style.display === 'none';
-        ca.style.display = hidden ? '' : 'none';
+        ca.style.display  = hidden ? '' : 'none';
+        col.style.maxHeight = hidden ? '' : 'none';
+        col.style.flex      = hidden ? '' : '1';
         btn.textContent = hidden ? '▼' : '▲';
     });
     document.body.appendChild(btn);
