@@ -1,6 +1,6 @@
 #[of]: root
 #[of]: bootstrap
-version: 2026-04-30 10:05
+version: 2026-04-30 12:19
 tf reads/edits structured files via labeled block tags (managed by TF).
 Project root is auto-detected — do not call tf_check_env / tf_initProject.
 
