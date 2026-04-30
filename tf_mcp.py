@@ -2152,7 +2152,7 @@ def tf(cmd: str) -> str:
         "tf_getBlockContent": tf_getBlockContent, "tf_editText": tf_editText,
         "tf_insert": tf_insert, "tf_insert_note": tf_insert_note,
         "tf_insert_ref": tf_insert_ref, "tf_replaceInBlock": tf_replaceInBlock,
-        "tf_addBlock": tf_addBlock, "tf_wrapBlock": tf_wrapBlock,
+        "tf_addBlock": tf_addBlock,
         "tf_wrapBlocks": tf_wrapBlocks, "tf_renameBlock": tf_renameBlock,
         "tf_moveBlock": tf_moveBlock, "tf_removeBlock": tf_removeBlock,
         "tf_duplicateBlock": tf_duplicateBlock, "tf_search": tf_search,

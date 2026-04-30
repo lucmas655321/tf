@@ -1040,10 +1040,10 @@ r = _tf({"tool": "tf_removeBlock", "path": TF + "@root/cap3", "write": True})
 ok("LT16 tf_removeBlock via lite", r, is_ok)
 _reset()
 
-# tf_wrapBlock
-r = _tf({"tool": "tf_wrapBlock", "path": TF + "@root/cap1", "label": "wrap_test",
-         "start": 0, "end": 1, "write": True})
-ok("LT17 tf_wrapBlock via lite", r, is_ok)
+# tf_wrapBlocks (single range — tf_wrapBlock removed from public server)
+r = _tf({"tool": "tf_wrapBlocks", "path": TF + "@root/cap1",
+         "blocks": [{"label": "wrap_test", "start": 0, "end": 1}], "write": True})
+ok("LT17 tf_wrapBlocks single range via public", r, is_ok)
 _reset()
 
 # tf_normalize

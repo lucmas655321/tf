@@ -1,6 +1,6 @@
 #[of]: root
 #[of]: bootstrap
-version: 2026-04-29 19:42
+version: 2026-04-30 10:05
 tf reads/edits structured files via labeled block tags (managed by TF).
 Project root is auto-detected — do not call tf_check_env / tf_initProject.
 
@@ -16,7 +16,7 @@ Search:          tf_search(path="f", pattern="regex")
 Edit text in a block:    tf_replaceInBlock(path, old_str, new_str)
 ADD a new sibling block: tf_addBlock(path=parent, label, text, after="sibling")
 Rewrite block body:      tf_editText (R1: getBlockContent first, keep [child] placeholders)
-Wrap visible lines:      tf_wrapBlock(path=parent, label, start, end)
+Wrap visible lines:      tf_wrapBlocks(path=parent, blocks=[{label, start, end}, ...])
 
 Rules (read once):
   R1  Read before tf_editText only (NOT replaceInBlock).
@@ -114,7 +114,7 @@ R4. New block = tf_addBlock. Never tf_replaceInBlock.
     works at file level but TF parses it as raw text inside the parent
     block, NOT as a sibling block (no block tags = no block).
     To add a sibling: tf_addBlock(path=parent, label, text, after="sibling").
-    To wrap existing visible lines into a new block: tf_wrapBlock.
+    To wrap existing visible lines into a new block: tf_wrapBlocks.
 
 R6. For tracing / call-chain questions: tf_search(mode="lines", context=N).
     Questions like "where does X come from?", "trace the lookup chain",
@@ -172,7 +172,7 @@ Precise semantics:
 - to exclude them, anchor the pattern to useful content e.g. "^[^#]*TODO".
 Integration with other tools:
 - mode='paths' + tf_getBlockContent: to read the matched block.
-- mode='lines' + tf_wrapBlock(start, end): to wrap a found section in a new block.
+- mode='lines' + tf_wrapBlocks([{label, start, end}]): to wrap a found section in a new block.
 Edge cases:
 - file without "#[of]: root" -> parser fails, tf_search returns error.
 - pattern with quotes: remember JSON escaping ("pattern": "\"quoted\"").
@@ -202,7 +202,7 @@ es:    tf({"tool":"tf_getBlockContent","path":"WS@root/parser"})
 mode='structured' (default): children are replaced by [label] placeholders.
   Use this output as the base for tf_editText: you must preserve the [label]s.
 mode='expanded': flat text with all children expanded. For inspection, not writing.
-numbered=True: prepends the absolute line number to each line. Needed for tf_wrapBlock.
+numbered=True: prepends the absolute line number to each line. Needed for tf_wrapBlocks.
 Pagination: blocks > ~50 lines return a chunk and next_offset in the JSON.
   Call again with offset=next_offset to get the continuation.
 #[cf]
@@ -341,9 +341,8 @@ Tip: to insert a method between two existing methods, use after='prev_method'.
 #[cf]
 #[of]: tf_wrapBlock
 #[of]: l1
-firma: tf_wrapBlock(path, label, start, end, write=False)
-scopo: wraps lines [start..end] of the block specified in path in a new sub-block "label".
-es:    tf({"tool":"tf_wrapBlock","path":"WS@root/myclass","label":"helpers","start":2,"end":5})
+DEPRECATED — use tf_wrapBlocks([{label, start, end}]) instead.
+tf_wrapBlocks handles single and multiple ranges atomically (no shift drift).
 #[cf]
 #[of]: l2
 start/end are VISIBLE ROW numbers (0-based) relative to the block in path
@@ -574,7 +573,7 @@ Edit text in a block:    tf_replaceInBlock(path, old_str, new_str)
 ADD a new sibling block: tf_addBlock(path=parent, label, text, after="sibling")
   - NEVER use tf_replaceInBlock to insert a new function/method (R4).
 
-Wrap visible lines:      tf_wrapBlock(path=parent, label, start, end)
+Wrap visible lines:      tf_wrapBlocks(path=parent, blocks=[{label, start, end}, ...])
   - start/end are visible row numbers from getBlockContent(numbered=True).
   - many wraps in one shot: tf_wrapBlocks (no shift drift).
 
