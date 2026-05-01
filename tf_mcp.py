@@ -939,30 +939,27 @@ def tf_addBlock(path: str, label: str, line: int = -1, text: str = "",
 @mcp.tool()
 def tf_wrapBlock(path: str, label: str, start: int, end: int, write: bool = True) -> dict:
     """Wrap existing lines into a new block.
-    start/end = visible row numbers (0-based) relative to the block specified in path,
+    path MUST include a block specifier (e.g. 'file.py@root').
+    start/end = visible row numbers (0-based) relative to that block,
     as returned by tf_getBlockContent(numbered=True, mode='structured').
-    If path has no '@' block specifier, start/end are treated as absolute 0-based file lines
-    (legacy mode, for backward compatibility).
     For multiple wraps use tf_wrapBlocks. See tf_man(topic='flows/f_onboard').
     """
     if end is None:
         return {"ok": False, "error": "end is required"}
+    if '@' not in path:
+        return {"ok": False, "error": "path must include a block specifier (e.g. 'file.py@root'). Use tf_onboard() to initialize a file before wrapping blocks."}
 
     file_path, lines, root, open_tag, close_tag = _load(path)
 
-    # If a block path is specified, convert visible rows to absolute file lines
-    if '@' in path:
-        block_path = path.split('@', 1)[1]
-        block = get_block(root, block_path)
-        if block is None:
-            return {"ok": False, "error": f"block not found: {block_path}"}
-        try:
-            abs_start, _ = visible_to_physical(block, lines, start)
-            abs_end,   _ = visible_to_physical(block, lines, end)
-        except ValueError as e:
-            return {"ok": False, "error": str(e)}
-    else:
-        abs_start, abs_end = start, end
+    block_path = path.split('@', 1)[1]
+    block = get_block(root, block_path)
+    if block is None:
+        return {"ok": False, "error": f"block not found: {block_path}"}
+    try:
+        abs_start, _ = visible_to_physical(block, lines, start)
+        abs_end,   _ = visible_to_physical(block, lines, end)
+    except ValueError as e:
+        return {"ok": False, "error": str(e)}
 
     open_re  = re.compile(re.escape(open_tag) + r'\s*(\S+)')
     close_re = re.compile(re.escape(close_tag))
@@ -982,35 +979,32 @@ def tf_wrapBlock(path: str, label: str, start: int, end: int, write: bool = True
 @mcp.tool()
 def tf_wrapBlocks(path: str, blocks: list, write: bool = True) -> dict:
     """Wrap multiple line ranges into new blocks in one call (no shift drift).
-    blocks: [{label, start, end}] with visible row numbers relative to the block in path
+    path MUST include a block specifier (e.g. 'file.py@root').
+    blocks: [{label, start, end}] with visible row numbers relative to that block
     (0-based, as returned by tf_getBlockContent numbered=True structured).
-    If path has no '@' block specifier, start/end are absolute 0-based file lines (legacy).
     PREFER over multiple tf_wrapBlock. See tf_man(topic='flows/f_onboard').
     """
     if not blocks:
         return {"ok": False, "error": "blocks is empty"}
+    if '@' not in path:
+        return {"ok": False, "error": "path must include a block specifier (e.g. 'file.py@root'). Use tf_onboard() to initialize a file before wrapping blocks."}
 
     file_path, lines, root, open_tag, close_tag = _load(path)
     open_re  = re.compile(re.escape(open_tag) + r'\s*(\S+)')
     close_re = re.compile(re.escape(close_tag))
 
-    # If a block path is specified, convert all visible rows to absolute lines up front.
-    # Must be done before any wrap (which shifts lines), using the original line map.
-    if '@' in path:
-        block_path = path.split('@', 1)[1]
-        block = get_block(root, block_path)
-        if block is None:
-            return {"ok": False, "error": f"block not found: {block_path}"}
-        resolved = []
-        for b in blocks:
-            try:
-                abs_start, _ = visible_to_physical(block, lines, b["start"])
-                abs_end,   _ = visible_to_physical(block, lines, b["end"])
-            except ValueError as e:
-                return {"ok": False, "error": f"{b['label']}: {e}"}
-            resolved.append({"label": b["label"], "start": abs_start, "end": abs_end})
-    else:
-        resolved = blocks
+    block_path = path.split('@', 1)[1]
+    block = get_block(root, block_path)
+    if block is None:
+        return {"ok": False, "error": f"block not found: {block_path}"}
+    resolved = []
+    for b in blocks:
+        try:
+            abs_start, _ = visible_to_physical(block, lines, b["start"])
+            abs_end,   _ = visible_to_physical(block, lines, b["end"])
+        except ValueError as e:
+            return {"ok": False, "error": f"{b['label']}: {e}"}
+        resolved.append({"label": b["label"], "start": abs_start, "end": abs_end})
 
     # process bottom-up: each wrap does not shift preceding line numbers
     sorted_blocks = sorted(resolved, key=lambda b: b["start"], reverse=True)
