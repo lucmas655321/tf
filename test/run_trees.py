@@ -11,6 +11,7 @@ import sys, os, json, tempfile, shutil
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, ROOT)
 import tf_mcp as m
+import tf_backend as _tfb
 #[cf]
 #[of]: fixture
 FIXTURE_FILES = {
@@ -276,7 +277,7 @@ def has(r, *words): return all(w in r for w in words)
 #[of]: main
 _tmp = setup_fixture()
 # Setta il cwd alla fixture — sovrascrive qualsiasi config locale
-m._PROJECT_CWD = _tmp
+_tfb._PROJECT_CWD = _tmp
 
 try:
 #[of]: T_root

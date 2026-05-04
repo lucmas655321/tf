@@ -11,6 +11,7 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, ROOT)
 
 import tf_mcp as m   # importa le funzioni direttamente (senza server MCP)
+import tf_backend as _tfb
 
 # CWD fixture — CI non ha .tf/config.tf; creiamo una dir temporanea minimale
 _cwd_tmp = tempfile.mkdtemp(prefix="tf_mcp_test_cwd_")
@@ -18,7 +19,7 @@ _tf_dir = os.path.join(_cwd_tmp, ".tf")
 os.makedirs(_tf_dir)
 with open(os.path.join(_tf_dir, "config.tf"), "w") as _f:
     _f.write(f"#[of]: root\n#[of]: config\ncwd = {_cwd_tmp}\n#[cf]\n#[cf]\n")
-m._PROJECT_CWD = _cwd_tmp
+_tfb._PROJECT_CWD = _cwd_tmp
 
 # ---------------------------------------------------------------------------
 # Infrastruttura runner
